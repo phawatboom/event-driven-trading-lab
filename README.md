@@ -2,6 +2,13 @@
 
 A standalone, deterministic **market-making and inventory risk-control simulator** built for engineering education. The application is deliberately independent of third-party trading exchanges and has no real market connectivity.
 
+This portfolio also documents engineering work from a larger private trading
+project. Start with the [technical case study](docs/CASE_STUDY.md) and
+[implementation coverage map](docs/PORTFOLIO_COVERAGE.md) for its full scope:
+Go/Python services, order-book pricing, execution recovery, process coordination,
+observability, testing and experiment design. The coverage map distinguishes
+runnable examples from capabilities described only in the case study.
+
 ## What it demonstrates
 
 - **Inventory-aware market making**: two-sided quotes shift away from accumulating inventory.
@@ -9,6 +16,8 @@ A standalone, deterministic **market-making and inventory risk-control simulator
 - **Event-driven accounting**: signed fills update cash and position; P&L is marked to the final synthetic midpoint.
 - **Reproducibility**: seeded synthetic events make tests and experiments deterministic.
 - **Risk measurement**: peak and average absolute position are recorded before and after every hedge.
+- **Selected order-book example**: exclude desk orders for pricing while checking the whole book for crossing risk.
+- **Selected recovery example**: restore in-memory account balances, ignore replayed sequences and disable processing when execution history is missing.
 
 ## Architecture
 
@@ -43,6 +52,17 @@ For Windows PowerShell, use `$env:PYTHONPATH='src'` rather than `PYTHONPATH=src`
 
 The CLI outputs a JSON summary with mark-to-market P&L in **cents**, fill counts, and inventory-risk metrics. It does not claim historical trading profitability.
 
+Run the separate recovery example after installation:
+
+```bash
+python examples/recovery.py
+```
+
+Without installation, set `PYTHONPATH` as above. This example uses synthetic
+normalized executions. It demonstrates state restoration and missing-history
+protection; it has no broker connection or durable storage. `book.py` and
+`recovery.py` are separate examples, not components of the simulation loop.
+
 ## Core design
 
 **Quote generation.** The quoter shifts its reservation price by a fixed tick adjustment per unit of inventory. It publishes both sides unless the hard cap would be exceeded by a new fill. When long, bids become less aggressive; when short, asks become less aggressive.
@@ -55,7 +75,11 @@ The CLI outputs a JSON summary with mark-to-market P&L in **cents**, fill counts
 
 ## Quality checks
 
-Tests cover signed accounting, risk limiting, inventory skews, invalid input, deterministic runs, and no-fill behavior. CI executes the tests on supported Python versions.
+Tests cover signed accounting, risk limiting, inventory skews, invalid input,
+deterministic runs, no-fill behavior, external-book filtering, sibling crossing
+risk, partial order reductions, checkpoint restoration, replay deduplication,
+per-instrument exposure and fail-closed history gaps. CI executes the tests on
+supported Python versions.
 
 ## Limitations
 
@@ -63,7 +87,14 @@ This project is an **educational demonstration**. It does not establish expected
 
 ## Provenance
 
-This is an independently authored example based on general concepts in electronic trading and risk engineering. It is **not** an employer assessment, a redistribution of any employer's simulation, or a reproduction of any private exchange protocol. No employer-provided code, fixtures, prompt, transcript, branding, or grading setup is included.
+The public code uses general concepts in electronic trading and risk
+engineering. Selected examples were written for this repository after reviewing
+the private project; they are not verbatim source extracts or a claim of a
+clean-room process. The case study distinguishes new work from repairs to an
+inherited taker and extensions to a supplied market simulator, and acknowledges
+AI-assisted development. No employer-provided source, exchange image, protocol,
+fixtures, assessment instructions, raw transcript, branding or private experiment
+outputs are included. The public code does not reproduce the full private desk.
 
 ## License
 

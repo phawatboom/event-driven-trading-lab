@@ -2,7 +2,7 @@
 
 ## Scope and invariants
 
-The model intentionally uses synchronous event processing with deterministic random seeds. It avoids pretending to simulate distributed order handling. Cents and integer ticks prevent floating-point price drift.
+The model intentionally uses synchronous event processing with deterministic random seeds. It avoids pretending to simulate distributed order handling. Cents and integer ticks prevent floating-point price drift. Separate book and recovery examples illustrate additional concepts without changing that execution model. See the [coverage map](PORTFOLIO_COVERAGE.md) for what is runnable and the [case study](CASE_STUDY.md) for the larger private project's design.
 
 Invariants:
 1. Every fill quantity and price must be positive.
@@ -26,7 +26,7 @@ Unit tests target numerical accounting and state transitions. Deterministic simu
 1. Replace independent maker-fill probabilities with a queue-aware order-book model.
 2. Measure the sensitivity of P&L and position risk over many seeds and market regimes.
 3. Add cancellation, stale quote protection, and latency simulation.
-4. Model partial hedge fills, unknown execution outcomes, and idempotent reconciliation.
+4. Integrate partial hedge fills, unknown execution outcomes, and idempotent reconciliation into the simulator. The separate recovery example only demonstrates normalized execution replay in memory.
 5. Add explicit transaction fees and capital/margin constraints.
 
 The simulator is unsuitable for demonstrating alpha or expected live profitability until those limitations are addressed.
